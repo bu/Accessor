@@ -213,6 +213,11 @@ Remove records filter by options.where
 			return info.affectedRows;
 		} );
 
+### LICENSE
+
+Copyright (c) 2012 Buwei Chiu <bu@hax4.in>
+Licensed under the MIT License
+
 ### TODO
 
 * Check in where statement
