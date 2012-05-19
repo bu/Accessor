@@ -1,0 +1,19 @@
+{
+  "author": "Buwei Chiu <bu@hax4.in> (https://github.com/bu/)",
+  "name": "Accessor",
+  "description": "A database wrapper, provide easy access to database without writing SQL code",
+  "version": "0.1.0",
+  "homepage": "https://github.com/bu/Accessor",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bu/Accessor.git"
+  },
+  "dependencies": {
+  	"mysql": "0.9.6"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
