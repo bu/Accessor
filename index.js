@@ -9,8 +9,6 @@ var database = require("./database");
 var GenericObjectFactory = function(table_name) {
 	var obj = new GenericObject(table_name);
 
-	obj.setDBConnection( database.getInstance() );
-
 	return obj;
 };
 
@@ -21,18 +19,17 @@ var GenericObject = function(table_name) {
 	var self = this;
 
 	self._table_name = table_name;
-};
+	self._fields = []; 
 
-GenericObject.prototype.setDBConnection = function(db) {
-	var self = this;
-	
-	// prepare database connection
-	self._db = db;
-	
 	// collect fields
 	self.select( { limit: 1, offset: 0 }, function(err, data, fields) {
+		if(err) {
+			return;
+		}
+
 		self._fields = fields;
 	});
+
 };
 
 //
@@ -40,7 +37,7 @@ GenericObject.prototype.setDBConnection = function(db) {
 //
 GenericObject.prototype.create = function(dataObject, callback) {
 	var self = this;
-	
+
 	// sql building
 	var _sql_fieldValues = self._fieldValueBuilder(dataObject);
 
@@ -157,23 +154,27 @@ GenericObject.prototype._fieldValueBuilder = function(dataObject) {
 GenericObject.prototype._query = function(sql, callback) {
 	var self = this;
 
-	self._db.query(sql, function(err, data, fields) {
-		
-		if(err) {
-			console.log("ERROR: Database select error, detail: " + err);
-
-			process.nextTick(function() { callback(err); });
-
-			return;
+	database.getInstance(function(db) {
+		if(db === null) {
+			return callback(new Error("No database connection."));
 		}
 
-		console.log("QUERIED: " + sql);
-		
-		if(typeof fields === "undefined") {
-			process.nextTick(function() { callback( null, data ) ; });
-		} else {
-			process.nextTick(function() { callback( null, data, self._keys(fields) ) ; });
-		}
+		db.query(sql, function(err, data, fields) {
+			
+			if(err) {
+				console.log("ERROR: Database select error, detail: " + err);
+				process.nextTick(function() { callback(err); });
+				return;
+			}
+
+			console.log("QUERIED: " + sql);
+			
+			if(typeof fields === "undefined") {
+				process.nextTick(function() { callback( null, data ) ; });
+			} else {
+				process.nextTick(function() { callback( null, data, self._keys(fields) ) ; });
+			}
+		});
 	});
 };
 
