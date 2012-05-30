@@ -1,27 +1,31 @@
-# Accessor 0.1.0
+# Accessor 0.2.0
 
-A database wrapper, provide easy access to database without writing SQL code
+A database wrapper, provide easy access to databases.
 
+---
 
 ## Install & Setup
 
-1. Create a config directory under your application, e.g.
-   
-    	buGit/config/
-2. Then, create a database.js under config directory we just created, which contains like:
+1. Install through npm, following command will do that:
 
-		var databaseConfig = { 
-    		user: "YOUR_DATABASE_USER",
-		    password: "YOUR_DATABASE_PASSWORD",
-	    	database: "TARGET_DATABASE",
-	    	host: "localhost",
-    		port: 3306
-		};
+		npm install Accessor
+		
+2. Choose one of available database wrapper for your environment.
 
-		module.exports = databaseConfig;
+3. Now, Accessor is ready to use. Create config file if wrapper required.
 
-3. Now, Accessor is ready to use.
+## Available Database Wrapper
 
+### MongoDB
+* http://github.com/bu/Accessor_MongoDB 
+* **DBMS parameter:** MongoDB
+
+### MySQL
+
+* http://github.com/bu/Accessor_MySQL
+* **DBMS parameter:** MySQL 
+
+---
 
 ## Usage
 
@@ -31,194 +35,66 @@ A database wrapper, provide easy access to database without writing SQL code
 
 2. Place constructor where you need the Accessor
 
-		var tester = Accessor("YOUR_TARGET_TABLE");
-
-3. After initialization, Accessor will try to obtain the schema, and store it to verify  column existence while updating or creating.
-
-### Methods
-
-#### tester.select( {options}, callback(err, data, fields) );
-
-Perform a select query to obtain data, for example:
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
+		var tester = Accessor("YOUR_TARGET_TABLE", "DBMS"]);
 		
-		var options = {
-			where: [
-				["id", ">", 10],
-				"AND",
-				["email","LIKE","%@gmail.com"]
-			],
-			
-			limit: 100,
-			offset: 50,
-			
-			fields: ["name"]
-		};
-		
-		tester.select( options, function(err, data, fields) {
-			if(err) {
-				throw err;
-			}	
-			
-			return data;
-		} );
-
-Currently, {options} has implements following attributes:
- 
- * where
- * limit
- * offset
- * fields 		
- 
-##### Note
- 
-Options may omit which retrieve all records, i.e.
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
-		
-		tester.select( function(err, data, fields) {
-			if(err) {
-				throw err;
-			}	
-			
-			return data;
-		} );
-
-#### tester.create( {dataObject}, callback(err, info) );
-
-Insert data record by given dataObject
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
-		
-		var dataObject = {
-			name: "bu",
-			email: "bu@hax4.in",
-			nonSchemaColumn: "test"
-		};
-		
-		tester.create( dataObject, function(err, info) {
-			if(err) {
-				throw err;
-			}	
-			
-			return info.insertId;
-		} );
-
-##### Note
-
-* On above example, we give a non-exist column called "nonSchemaColumn" to Accessor, which may cause hangup if we insert that to sql query.
-
-	Indeed, Accessor will try to check each attribute and ignore them if not exists, and that should print *(on console)*
+	**Note: ** DBMS parameter could be emitted, if you installed just one module within your application. Accessor will automatically lookup your installed modules following Accessor directory to check if a suitable module is availiable.
 	
-		Warning: nonSchemaColumn is not in database schema, and is not inserted into queryset
+	**P.S.** YOUR_TARGET_TABLE may mean different things by different database wrapper, but it should automaticlly do the same thing.
 
+3. After initialized, please refer to wrapper documents for accessing database.
 
-#### tester.update( {options}, {updated_dataObject}, callback(err, info) );
+## Interface
 
-Update records filter by option.where with updated_dataObject
+Following methods are implements by our wrappers:
 
-		// test_table schema: id, name, email
+### SELECT
 
-		var tester = Accessor("test_table");
+	var options = {
+		// where: this option is differ from wrappers
+		where: Object or Array even String,
 		
-		var dataObject = {
-			email: "bu@hax4.in",
-			nonSchemaColumn: "test"
-		};
+		// limit: the count of return data
+		limit: 10 (default: no limit)
 		
-		var options = {
-			where: [ 
-				["name", "=", "bu"] 
-			],
-		};
+		// we should start lookup data at cursor position #XXX
+		offset: 100 (default: 0)
 		
-		tester.update( options, dataObject, function(err, info) {
-			if(err) {
-				throw err;
-			}	
-			
-			return info.affectedRows;
-		} );
-		
-##### Note
-
-* On above example, we give a non-exist column called "nonSchemaColumn" to Accessor, which may cause hangup if we update that in sql query.
-
-	Indeed, Accessor will try to check each attribute and ignore them if not exists, and that should print *(on console)*
+		// we should pick up which fields / keys
+		fields: ["field1","field2"]
+	};
 	
-		Warning: nonSchemaColumn is not in database schema, and is not inserted into queryset
-
-* If options is omitted, it will update all records. (due to no filter)
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
-		
-		var dataObject = {
-			email: "bu@hax4.in",
-			nonSchemaColumn: "test"
-		};
+	db.select(options, callback(err, data));
 	
-		tester.update( {}, dataObject, function(err, info) {
-			if(err) {
-				throw err;
-			}	
-			
-			return info.affectedRows;
-		} );
+	// data is a array contains queried data 
 
+### INSERT
 
-#### tester.remove( {options}, callback(err, info) );
-
-Remove records filter by options.where
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
-		
-		var options = {
-			where: [ 
-				["name", "=", "bu"] 
-			],
-		};
-		
-		tester.update( options, function(err, info) {
-			if(err) {
-				throw err;
-			}	
-			
-			return info.affectedRows;
-		} );
-		
-##### Note
-
-* If options is omitted, it will remove all records. (due to no filter)
-
-		// test_table schema: id, name, email
-
-		var tester = Accessor("test_table");
+	db.insert(dataObject, callback(err, info));
 	
-		tester.remove( {}, function(err, info) {
-			if(err) {
-				throw err;
-			}	
-			
-			return info.affectedRows;
-		} );
+	// callback parameter info = {success: INSERT_ID};
+	
+### REMOVE
 
-### LICENSE
+	db.remove(options, callback(err, info));
+	
+	// * method parameter options is a object only exists "where" as same as SELECT
+	// callback parameter info = {success: affect rows};
+	
+### UPDATE
+
+	db.update(options, replaceDataObject, callback(err, info));
+	
+	// * method parameter options is a object only exists "where" as same as SELECT
+	// * callback parameter info = {success: affect rows};
+
+### OTHER METHOD
+
+Some wrapper may define their own method, which is not implemented in all wrappers. Use them with care.
+
+---
+
+## LICENSE
 
 Copyright (c) 2012 Buwei Chiu <bu@hax4.in>
+
 Licensed under the MIT License
-
-### TODO
-
-* Check in where statement
-* Log
