@@ -25,8 +25,6 @@ A database wrapper, provide easy access to databases.
 * http://github.com/bu/Accessor_MySQL
 * **DBMS parameter:** MySQL 
 
----
-
 ## Usage
 
 1. Require the Accessor module in your script
@@ -91,7 +89,6 @@ Following methods are implements by our wrappers:
 
 Some wrapper may define their own method, which is not implemented in all wrappers. Use them with care.
 
----
 
 ## LICENSE
 
