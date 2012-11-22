@@ -13,9 +13,17 @@ module.exports = function(table_name, database_engine) {
 	// if engine is specified, we will try to require that, but if not found, we should fallback to auto-lookup
 	try {
 		engine = require("Accessor_" + database_engine);
+
 		return returnInstance();
 	} catch(e) {
-		return findInstalledModule();
+		
+		try {
+			engine = require("accessor_" + database_engine);
+
+			return returnInstance();
+		} catch(e) {
+			return findInstalledModule();
+		}
 	}
 	
 	// return engine to user
@@ -33,7 +41,7 @@ module.exports = function(table_name, database_engine) {
 		fs.readdir( path.join(__dirname, ".."), function(err, files) {
 			files.map(function(filename) {
 				// if not our module, skip it
-				if(filename.match(/Accessor_.*/) === null) {
+				if(filename.match(/[Accessor_.*/) === null) {
 					return;
 				}
 
