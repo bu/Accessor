@@ -6,7 +6,7 @@
   },
   "name": "Accessor",
   "description": "A database wrapper, provide easy access to databases",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "https://github.com/bu/Accessor",
   "repository": {
     "type": "git",

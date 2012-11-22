@@ -18,7 +18,7 @@ module.exports = function(table_name, database_engine) {
 	} catch(e) {
 		
 		try {
-			engine = require("accessor_" + database_engine);
+			engine = require("accessor_" + database_engine.toLowerCase() );
 
 			return returnInstance();
 		} catch(e) {
