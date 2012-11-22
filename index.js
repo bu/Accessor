@@ -41,7 +41,7 @@ module.exports = function(table_name, database_engine) {
 		fs.readdir( path.join(__dirname, ".."), function(err, files) {
 			files.map(function(filename) {
 				// if not our module, skip it
-				if(filename.match(/[Accessor_.*/) === null) {
+				if(filename.match(/Accessor_.*/) === null) {
 					return;
 				}
 
